@@ -89,6 +89,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private String cropperStatusBarColor = null;
     private String cropperToolbarColor = null;
     private String cropperToolbarTitle = null;
+    private String cropperToolbarTitle2 = null;
     private String cropperToolbarWidgetColor = null;
 
     private int width = 0;
@@ -130,6 +131,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         cropperStatusBarColor = options.hasKey("cropperStatusBarColor") ? options.getString("cropperStatusBarColor") : null;
         cropperToolbarColor = options.hasKey("cropperToolbarColor") ? options.getString("cropperToolbarColor") : null;
         cropperToolbarTitle = options.hasKey("cropperToolbarTitle") ? options.getString("cropperToolbarTitle") : null;
+        cropperToolbarTitle2 = options.hasKey("cropperToolbarTitle2") ? options.getString("cropperToolbarTitle2") : null;
         cropperToolbarWidgetColor = options.hasKey("cropperToolbarWidgetColor") ? options.getString("cropperToolbarWidgetColor") : null;
         cropperCircleOverlay = options.hasKey("cropperCircleOverlay") && options.getBoolean("cropperCircleOverlay");
         freeStyleCropEnabled = options.hasKey("freeStyleCropEnabled") && options.getBoolean("freeStyleCropEnabled");
@@ -668,6 +670,9 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
         if (cropperToolbarTitle != null) {
             options.setToolbarTitle(cropperToolbarTitle);
+        }
+        if (cropperToolbarTitle2 != null) {
+            // options.setToolbarTitle2(cropperToolbarTitle2);
         }
 
         if (enableRotationGesture) {
