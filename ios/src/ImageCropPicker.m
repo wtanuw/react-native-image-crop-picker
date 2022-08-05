@@ -886,8 +886,9 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         }
         
         cropVC.title = [[self options] objectForKey:@"cropperToolbarTitle"];
-        // cropVC.title2 = [[self options] objectForKey:@"cropperToolbarTitle2"];
+        cropVC.title2 = [[self options] objectForKey:@"cropperToolbarTitle2"];
         cropVC.titleLabel.numberOfLines = 3;
+        cropVC.titleLabel2.numberOfLines = 2;
         cropVC.delegate = self;
         
         cropVC.doneButtonTitle = [self.options objectForKey:@"cropperChooseText"];

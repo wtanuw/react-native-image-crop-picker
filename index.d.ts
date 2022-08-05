@@ -236,6 +236,13 @@ declare module "react-native-image-crop-picker" {
         cropperToolbarTitle2?: string;
 
         /**
+         * When cropping image, determines the title of Toolbar.
+         *
+         * @default 'Edit Photo'
+         */
+        cropperToolbarTitle3?: string;
+
+        /**
          * Enables user to apply custom rectangle area for cropping.
          *
          * @platform iOS only
