@@ -1,4 +1,5 @@
-package com.reactnative.ivpusic.imagepicker;
+// package com.reactnative.ivpusic.imagepicker;
+package com.yalantis.ucrop;
 
 import android.Manifest;
 import android.app.Activity;
@@ -672,7 +673,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             options.setToolbarTitle(cropperToolbarTitle);
         }
         if (cropperToolbarTitle2 != null) {
-            // options.setToolbarTitle2(cropperToolbarTitle2);
+            options.setToolbarTitle2(cropperToolbarTitle2);
         }
 
         if (enableRotationGesture) {

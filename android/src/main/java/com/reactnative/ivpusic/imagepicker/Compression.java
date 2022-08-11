@@ -1,4 +1,5 @@
-package com.reactnative.ivpusic.imagepicker;
+// package com.reactnative.ivpusic.imagepicker;
+package com.yalantis.ucrop;
 
 import android.app.Activity;
 import android.content.Context;
