@@ -23,6 +23,7 @@ import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
@@ -68,6 +69,9 @@ public class UCrop {
     private UCrop(@NonNull Uri source, @NonNull Uri destination) {
         mCropIntent = new Intent();
         mCropOptionsBundle = new Bundle();
+        Log.v("ucrop", "*-*-*-*-*-*-*-*-");
+        Log.v("ucrop", source.toString());
+        Log.v("ucrop",destination.toString());
         mCropOptionsBundle.putParcelable(EXTRA_INPUT_URI, source);
         mCropOptionsBundle.putParcelable(EXTRA_OUTPUT_URI, destination);
     }
@@ -202,6 +206,63 @@ public class UCrop {
         mCropOptionsBundle = bundle;
         return getFragment();
     }
+public static String intentToString(Intent intent) {
+    if (intent == null) {
+        return null;
+    }
+
+    return intent.toString() + " " + bundleToString(intent.getExtras());
+}
+
+public static String bundleToString(Bundle bundle) {
+    StringBuilder out = new StringBuilder("Bundle[");
+
+    if (bundle == null) {
+        out.append("null");
+    } else {
+        boolean first = true;
+        for (String key : bundle.keySet()) {
+            if (!first) {
+                out.append(", ");
+            }
+
+            out.append(key).append('=');
+
+            Object value = bundle.get(key);
+
+            if (value instanceof int[]) {
+                out.append(Arrays.toString((int[]) value));
+            } else if (value instanceof byte[]) {
+                out.append(Arrays.toString((byte[]) value));
+            } else if (value instanceof boolean[]) {
+                out.append(Arrays.toString((boolean[]) value));
+            } else if (value instanceof short[]) {
+                out.append(Arrays.toString((short[]) value));
+            } else if (value instanceof long[]) {
+                out.append(Arrays.toString((long[]) value));
+            } else if (value instanceof float[]) {
+                out.append(Arrays.toString((float[]) value));
+            } else if (value instanceof double[]) {
+                out.append(Arrays.toString((double[]) value));
+            } else if (value instanceof String[]) {
+                out.append(Arrays.toString((String[]) value));
+            } else if (value instanceof CharSequence[]) {
+                out.append(Arrays.toString((CharSequence[]) value));
+            } else if (value instanceof Parcelable[]) {
+                out.append(Arrays.toString((Parcelable[]) value));
+            } else if (value instanceof Bundle) {
+                out.append(bundleToString((Bundle) value));
+            } else {
+                out.append(value);
+            }
+
+            first = false;
+        }
+    }
+
+    out.append("]");
+    return out.toString();
+}
 
     /**
      * Retrieve cropped image Uri from the result Intent
@@ -289,6 +350,8 @@ public class UCrop {
         public static final String EXTRA_UCROP_WIDGET_COLOR_TOOLBAR = EXTRA_PREFIX + ".UcropToolbarWidgetColor";
         public static final String EXTRA_UCROP_TITLE_TEXT_TOOLBAR = EXTRA_PREFIX + ".UcropToolbarTitleText";
         public static final String EXTRA_UCROP_TITLE_TEXT_TOOLBAR2 = EXTRA_PREFIX + ".UcropToolbarTitleText2";
+        public static final String EXTRA_UCROP_TITLE_TEXT_CHOOSE = EXTRA_PREFIX + ".UcropToolbarChooseText";
+        public static final String EXTRA_UCROP_TITLE_TEXT_CANCEL = EXTRA_PREFIX + ".UcropToolbarCancelText";
         public static final String EXTRA_UCROP_WIDGET_CANCEL_DRAWABLE = EXTRA_PREFIX + ".UcropToolbarCancelDrawable";
         public static final String EXTRA_UCROP_WIDGET_CROP_DRAWABLE = EXTRA_PREFIX + ".UcropToolbarCropDrawable";
 
@@ -481,6 +544,20 @@ public class UCrop {
          */
         public void setToolbarTitle2(@Nullable String text) {
             mOptionBundle.putString(EXTRA_UCROP_TITLE_TEXT_TOOLBAR2, text);
+        }
+
+        /**
+         * @param text - desired text for Choose button
+         */
+        public void setCropperChooseText(@Nullable String text) {
+            mOptionBundle.putString(EXTRA_UCROP_TITLE_TEXT_CHOOSE, text);
+        }
+
+        /**
+         * @param text - desired text for Choose button
+         */
+        public void setCropperCancelText(@Nullable String text) {
+            mOptionBundle.putString(EXTRA_UCROP_TITLE_TEXT_CANCEL, text);
         }
 
         /**

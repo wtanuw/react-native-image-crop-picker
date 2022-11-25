@@ -55,6 +55,9 @@ import androidx.core.content.ContextCompat;
 import androidx.transition.AutoTransition;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
@@ -85,6 +88,8 @@ public class UCropActivity extends AppCompatActivity {
 
     private String mToolbarTitle;
     private String mToolbarTitle2;
+    private String mCropperChooseText;
+    private String mCropperCancelText;
 
     // Enables dynamic coloring
     private int mToolbarColor;
@@ -159,6 +164,14 @@ public class UCropActivity extends AppCompatActivity {
             menuItemCropIcon.mutate();
             menuItemCropIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
             menuItemCrop.setIcon(menuItemCropIcon);
+            if (mCropperChooseText != null) {
+            menuItemCrop.setIcon(null);
+            SpannableString s = new SpannableString(mCropperChooseText);
+            // int color = getResources().getColor(R.color.ucrop_color_white);
+            int color = mToolbarWidgetColor;
+            s.setSpan(new ForegroundColorSpan(color), 0, s.length(), 0);
+            menuItemCrop.setTitle(s);
+            }
         }
 
         return true;
@@ -298,6 +311,10 @@ public class UCropActivity extends AppCompatActivity {
         mToolbarTitle = mToolbarTitle != null ? mToolbarTitle : getResources().getString(R.string.ucrop_label_edit_photo);
         mToolbarTitle2 = intent.getStringExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_TOOLBAR2);
         mToolbarTitle2 = mToolbarTitle2 != null ? mToolbarTitle2 : getResources().getString(R.string.ucrop_label_edit_photo);
+        mCropperChooseText = intent.getStringExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_CHOOSE);
+        mCropperChooseText = mCropperChooseText != null ? mCropperChooseText : null;
+        mCropperCancelText = intent.getStringExtra(UCrop.Options.EXTRA_UCROP_TITLE_TEXT_CANCEL);
+        mCropperCancelText = mCropperCancelText != null ? mCropperCancelText : null;
         mLogoColor = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_LOGO_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_default_logo));
         mShowBottomControls = !intent.getBooleanExtra(UCrop.Options.EXTRA_HIDE_BOTTOM_CONTROLS, false);
         mRootViewBackgroundColor = intent.getIntExtra(UCrop.Options.EXTRA_UCROP_ROOT_VIEW_BACKGROUND_COLOR, ContextCompat.getColor(this, R.color.ucrop_color_crop_background));

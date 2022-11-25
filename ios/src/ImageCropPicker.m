@@ -805,7 +805,7 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
     CGSize desiredImageSize = CGSizeMake([[[self options] objectForKey:@"width"] intValue],
                                          [[[self options] objectForKey:@"height"] intValue]);
     
-    UIImage *resizedImage = [croppedImage resizedImageToFitInSize:desiredImageSize scaleIfSmaller:YES];
+    UIImage *resizedImage = [croppedImage resizedImageToFitInSize:desiredImageSize scaleIfSmaller:NO];
     ImageResult *imageResult = [self.compression compressImage:resizedImage withOptions:self.options];
     
     NSString *filePath = [self persistFile:imageResult.data];
