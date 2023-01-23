@@ -335,6 +335,8 @@ public static String bundleToString(Bundle bundle) {
         public static final String EXTRA_SHOW_CROP_FRAME = EXTRA_PREFIX + ".ShowCropFrame";
         public static final String EXTRA_CROP_FRAME_COLOR = EXTRA_PREFIX + ".CropFrameColor";
         public static final String EXTRA_CROP_FRAME_STROKE_WIDTH = EXTRA_PREFIX + ".CropFrameStrokeWidth";
+        public static final String EXTRA_CROP_CORNER_STROKE_WIDTH = EXTRA_PREFIX + ".CropCornerStrokeWidth";
+        public static final String EXTRA_CROP_CORNER_STROKE_LENGTH = EXTRA_PREFIX + ".CropCornerStrokeLength";
 
         public static final String EXTRA_SHOW_CROP_GRID = EXTRA_PREFIX + ".ShowCropGrid";
         public static final String EXTRA_CROP_GRID_ROW_COUNT = EXTRA_PREFIX + ".CropGridRowCount";
@@ -460,6 +462,20 @@ public static String bundleToString(Bundle bundle) {
          */
         public void setCropFrameStrokeWidth(@IntRange(from = 0) int width) {
             mOptionBundle.putInt(EXTRA_CROP_FRAME_STROKE_WIDTH, width);
+        }
+
+        /**
+         * @param width - desired width of crop frame line in pixels
+         */
+        public void setCropCornerStrokeWidth(@IntRange(from = 0) int width) {
+            mOptionBundle.putInt(EXTRA_CROP_CORNER_STROKE_WIDTH, width);
+        }
+
+        /**
+         * @param width - desired width of crop frame line in pixels
+         */
+        public void setCropCornerStrokeLength(@IntRange(from = 0) int width) {
+            mOptionBundle.putInt(EXTRA_CROP_CORNER_STROKE_LENGTH, width);
         }
 
         /**

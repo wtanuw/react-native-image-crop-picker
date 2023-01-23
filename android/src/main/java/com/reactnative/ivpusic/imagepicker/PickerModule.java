@@ -104,6 +104,14 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private int width = 0;
     private int height = 0;
 
+    private boolean ratioLock = false;
+    private double ratioWidth = 0;
+    private double ratioHeight = 0;
+    private String cropFrameColor = "#ffffff";
+    private int cropFrameWidth = 0;
+    private int cropCornerLength = 0;
+    private int cropCornerWidth = 0;
+
     private Uri mCameraCaptureURI;
     private String mCurrentMediaPath;
     private ResultCollector resultCollector = new ResultCollector();
@@ -152,6 +160,13 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         enableRotationGesture = options.hasKey("enableRotationGesture") && options.getBoolean("enableRotationGesture");
         disableCropperColorSetters = options.hasKey("disableCropperColorSetters") && options.getBoolean("disableCropperColorSetters");
         useFrontCamera = options.hasKey("useFrontCamera") && options.getBoolean("useFrontCamera");
+        ratioLock = options.hasKey("ratioLock") && options.getBoolean("ratioLock");
+        ratioWidth = options.hasKey("ratioWidth") ? options.getDouble("ratioWidth") : 0;
+        ratioHeight = options.hasKey("ratioHeight") ? options.getDouble("ratioHeight") : 0;
+        cropFrameColor = options.hasKey("cropFrameColor") ? options.getString("cropFrameColor") : null;
+        cropFrameWidth = options.hasKey("cropFrameWidth") ? options.getInt("cropFrameWidth") : 0;
+        cropCornerLength = options.hasKey("cropCornerLength") ? options.getInt("cropCornerLength") : 0;
+        cropCornerWidth = options.hasKey("cropCornerWidth") ? options.getInt("cropCornerWidth") : 0;
         this.options = options;
     }
 
@@ -756,6 +771,11 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         if (cropperCancelText != null) {
             options.setCropperCancelText(cropperCancelText);
         }
+        options.setCropFrameColor(Color.parseColor(cropFrameColor));
+        options.setCropFrameStrokeWidth(cropFrameWidth);
+        options.setCropGridCornerColor(Color.parseColor(cropFrameColor));
+        options.setCropCornerStrokeWidth(cropCornerWidth);
+        options.setCropCornerStrokeLength(cropCornerLength);
 
         if (enableRotationGesture) {
             // UCropActivity.ALL = enable both rotation & scaling
@@ -774,7 +794,10 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
                 .of(uri, Uri.fromFile(new File(this.getTmpDir(activity), UUID.randomUUID().toString() + ".jpg")))
                 .withOptions(options);
 
-        if (width > 0 && height > 0) {
+
+        if (ratioWidth > 0 && ratioHeight > 0) {
+            uCrop.withAspectRatio((float)ratioWidth, (float)ratioHeight);
+        } else if (width > 0 && height > 0) {
             uCrop.withAspectRatio(width, height);
         }
 

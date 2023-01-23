@@ -72,7 +72,13 @@ RCT_EXPORT_MODULE();
             @"sortOrder": @"none",
             @"cropperCancelText": @"Cancel",
             @"cropperChooseText": @"Choose",
-            @"cropperRotateButtonsHidden": @NO
+            @"cropperRotateButtonsHidden": @NO,
+            @"ratioWidth": @0,
+            @"ratioHeight": @0,
+            // cropFrameColor: '#ffffff',
+            // cropFrameWidth: 0,
+            // cropCornerLength: 90,
+            // cropCornerWidth: 15,
         };
         self.compression = [[Compression alloc] init];
     }
@@ -889,6 +895,21 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         cropVC.title2 = [[self options] objectForKey:@"cropperToolbarTitle2"];
         cropVC.titleLabel.numberOfLines = 3;
         cropVC.titleLabel2.numberOfLines = 2;
+        NSNumber *ratioWidth = [self.options objectForKey:@"ratioWidth"];
+        NSNumber *ratioHeight = [self.options objectForKey:@"ratioHeight"];
+        if (ratioWidth.intValue > 0 && ratioHeight.intValue > 0) {
+            cropVC.customAspectRatio = CGSizeMake(ratioWidth.intValue, ratioHeight.intValue);
+        }
+        // cropFrameWidth: 0,
+        // cropCornerLength: 90,
+        // cropCornerWidth: 15,
+        NSNumber *cropFrameWidth = [self.options objectForKey:@"cropFrameWidth"];
+        NSNumber *cropCornerLength = [self.options objectForKey:@"cropCornerLength"];
+        NSNumber *cropCornerWidth = [self.options objectForKey:@"cropCornerWidth"];
+        cropVC.cropFrameWidth = cropFrameWidth.intValue;
+        cropVC.cropCornerLength = cropCornerLength.intValue;
+        cropVC.cropCornerWidth = cropCornerWidth.intValue;
+        cropVC.cropFrameColor = [ImageCropPicker colorWithHexString:[[self options] objectForKey:@"cropFrameColor"]];
         cropVC.delegate = self;
         
         cropVC.doneButtonTitle = [self.options objectForKey:@"cropperChooseText"];
@@ -897,6 +918,12 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         cropVC.doneButtonColor = [UIColor whiteColor];
         cropVC.cancelButtonColor = [UIColor whiteColor];
         
+        cropVC.toolbarPosition = TOCropViewControllerToolbarPositionTop;
+        cropVC.rotateClockwiseButtonHidden = YES;
+        cropVC.rotateButtonsHidden = YES;
+        cropVC.resetButtonHidden = YES;
+        cropVC.aspectRatioPickerButtonHidden = YES;
+        
         cropVC.modalPresentationStyle = UIModalPresentationFullScreen;
         if (@available(iOS 15.0, *)) {
             cropVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
@@ -904,6 +931,20 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         
         [[self getRootVC] presentViewController:cropVC animated:FALSE completion:nil];
     });
+}
++ (UIColor *)colorWithHexString:(NSString *)stringToConvert
+{
+    NSString *noHashString = [stringToConvert stringByReplacingOccurrencesOfString:@"#" withString:@""]; // remove the #
+    NSScanner *scanner = [NSScanner scannerWithString:noHashString];
+    [scanner setCharactersToBeSkipped:[NSCharacterSet symbolCharacterSet]]; // remove + and $
+
+    unsigned hex;
+    if (![scanner scanHexInt:&hex]) return nil;
+    int r = (hex >> 16) & 0xFF;
+    int g = (hex >> 8) & 0xFF;
+    int b = (hex) & 0xFF;
+
+    return [UIColor colorWithRed:r / 255.0f green:g / 255.0f blue:b / 255.0f alpha:1.0f];
 }
 #pragma mark - TOCropViewController Delegate
 - (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle {

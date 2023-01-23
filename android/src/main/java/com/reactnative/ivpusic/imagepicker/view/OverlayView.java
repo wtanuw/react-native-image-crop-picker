@@ -67,7 +67,8 @@ public class OverlayView extends View {
     private int mCurrentTouchCornerIndex = -1;
     private int mTouchPointThreshold;
     private int mCropRectMinSize;
-    private int mCropRectCornerTouchAreaLineLength;
+    private float mCropRectCornerTouchAreaLineLength;
+    private float mCropRectCornerWidth = 3;
 
     private OverlayViewChangeListener mCallback;
 
@@ -77,6 +78,7 @@ public class OverlayView extends View {
         mTouchPointThreshold = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_threshold);
         mCropRectMinSize = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_min_size);
         mCropRectCornerTouchAreaLineLength = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_area_line_length);
+        mCropRectCornerWidth = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_threshold);
     }
 
     public OverlayView(Context context) {
@@ -189,7 +191,24 @@ public class OverlayView extends View {
      * Setter for crop frame stroke width
      */
     public void setCropFrameStrokeWidth(@IntRange(from = 0) int width) {
-        mCropFramePaint.setStrokeWidth(width);
+        float unit = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_unit);
+        mCropFramePaint.setStrokeWidth(width*unit);
+    }
+
+    /**
+     * Setter for crop grid stroke width
+     */
+    public void setCropCornerStrokeWidth(@IntRange(from = 0) int width) {
+        float unit = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_unit);
+        mCropRectCornerWidth = width*unit;
+    }
+
+    /**
+     * Setter for crop grid stroke width
+     */
+    public void setCropCornerStrokeLength(@IntRange(from = 0) int width) {
+        float unit = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_unit);
+        mCropRectCornerTouchAreaLineLength = width*unit;
     }
 
     /**
@@ -505,7 +524,9 @@ public class OverlayView extends View {
         if (mShowCropFrame) {
             canvas.drawRect(mCropViewRect, mCropFramePaint);
         }
-
+        
+        mCropFrameCornersPaint.setStrokeWidth(mCropRectCornerWidth);
+        
         if (mFreestyleCropMode != FREESTYLE_CROP_MODE_DISABLE) {
             canvas.save();
 
@@ -553,11 +574,19 @@ public class OverlayView extends View {
         int cropFrameColor = a.getColor(R.styleable.ucrop_UCropView_ucrop_frame_color,
                 getResources().getColor(R.color.ucrop_color_default_crop_frame));
 
+
         mCropFramePaint.setStrokeWidth(cropFrameStrokeSize);
         mCropFramePaint.setColor(cropFrameColor);
         mCropFramePaint.setStyle(Paint.Style.STROKE);
 
-        mCropFrameCornersPaint.setStrokeWidth(cropFrameStrokeSize * 3);
+
+        if (mCropRectCornerWidth > cropFrameStrokeSize * 3) {
+          cropFrameStrokeSize = (int)mCropRectCornerWidth;
+        } else {
+          cropFrameStrokeSize = cropFrameStrokeSize * 3;
+        }
+
+        mCropFrameCornersPaint.setStrokeWidth(cropFrameStrokeSize);
         mCropFrameCornersPaint.setColor(cropFrameColor);
         mCropFrameCornersPaint.setStyle(Paint.Style.STROKE);
     }

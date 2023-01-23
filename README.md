@@ -153,6 +153,17 @@ ImagePicker.clean().then(() => {
 | cropperCancelText (ios only)            |           string (default Cancel)        | Cancel button text |
 | cropperRotateButtonsHidden (ios only)   |           bool (default false)           | Enable or disable cropper rotate buttons |
 
+### Request Object 2
+
+| Property                                |                   Type                   | Description                           |
+| --------------------------------------- | :--------------------------------------: | :--------------------------------------- |
+| ratioLock                               |           bool (default false)           | Enable or disable multiple image selection |
+| ratioWidth                              |            number (default 1)            | Width of result image when used with `cropping` option |
+| ratioHeight                             |            number (default 1)            | Height of result image when used with `cropping` option |
+| cropFrameColor                          |       string (default `"#424242"`)       | When cropping image, determines ActiveWidget color. |
+| cropFrameWidth                          |            number (default 1)            | Min number of files to select when using `multiple` option |
+| cropCornerLength                        |            number (default 1)            | Min number of files to select when using `multiple` option |
+| cropCornerWidth                         |            number (default 1)            | Min number of files to select when using `multiple` option |
 
 #### Smart Album Types (ios)
 
