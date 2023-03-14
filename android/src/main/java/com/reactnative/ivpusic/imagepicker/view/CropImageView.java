@@ -20,6 +20,7 @@ import com.yalantis.ucrop.util.RectUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import android.util.Log;
 
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
@@ -121,6 +122,71 @@ public class CropImageView extends TransformImageView {
                 cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
         calculateImageScaleBounds();
         setImageToWrapCropBounds();
+    }
+    public boolean isValidCropRect(RectF cropRect) {
+        // mTargetAspectRatio = cropRect.width() / cropRect.height();
+        // mCropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
+        //         cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
+        // calculateImageScaleBounds();
+        // setImageToWrapCropBounds();
+              Log.d("isValidCropRect", "cropRect"+cropRect);
+        // mTargetAspectRatio = cropRect.width() / cropRect.height();
+        cropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
+                cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
+              Log.d("isValidCropRect", "cropRect"+cropRect);
+        if (true) {
+
+            float currentX = mCurrentImageCenter[0];
+            float currentY = mCurrentImageCenter[1];
+            float currentScale = getCurrentScale();
+
+            float deltaX = mCropRect.centerX() - currentX;
+            float deltaY = mCropRect.centerY() - currentY;
+            float deltaScale = 0;
+
+            // mTempMatrix.reset();
+            // mTempMatrix.setTranslate(deltaX, deltaY);
+            //   Log.d("myTag", "mTempMatrix"+mTempMatrix);
+
+            final float[] tempCurrentImageCorners = Arrays.copyOf(mCurrentImageCorners, mCurrentImageCorners.length);
+            mTempMatrix.mapPoints(tempCurrentImageCorners);
+Log.d("myTag", "tempCurrentImageCorners: " + Arrays.toString(tempCurrentImageCorners));
+            boolean willImageWrapCropBoundsAfterTranslate = isImageWrapCropBounds7(tempCurrentImageCorners, cropRect);
+
+            if (willImageWrapCropBoundsAfterTranslate) {
+              Log.d("myTag", "true");
+              return true;
+                // final float[] imageIndents = calculateImageIndents();
+                // deltaX = -(imageIndents[0] + imageIndents[2]);
+                // deltaY = -(imageIndents[1] + imageIndents[3]);
+            } else {
+              Log.d("myTag", "false");
+              return false;
+
+                // RectF tempCropRect = new RectF(mCropRect);
+                // mTempMatrix.reset();
+                // mTempMatrix.setRotate(getCurrentAngle());
+                // mTempMatrix.mapRect(tempCropRect);
+
+                // final float[] currentImageSides = RectUtils.getRectSidesFromCorners(mCurrentImageCorners);
+
+                // deltaScale = Math.max(tempCropRect.width() / currentImageSides[0],
+                //         tempCropRect.height() / currentImageSides[1]);
+                // deltaScale = deltaScale * currentScale - currentScale;
+            }
+
+            // if (animate) {
+            //     post(mWrapCropBoundsRunnable = new WrapCropBoundsRunnable(
+            //             CropImageView.this, mImageToWrapCropBoundsAnimDuration, currentX, currentY, deltaX, deltaY,
+            //             currentScale, deltaScale, willImageWrapCropBoundsAfterTranslate));
+            // } else {
+            //     postTranslate(deltaX, deltaY);
+            //     if (!willImageWrapCropBoundsAfterTranslate) {
+            //         zoomInImage(currentScale + deltaScale, mCropRect.centerX(), mCropRect.centerY());
+            //     }
+            // }
+        }
+              return false;
     }
 
     /**
@@ -423,9 +489,26 @@ public class CropImageView extends TransformImageView {
         float[] unrotatedImageCorners = Arrays.copyOf(imageCorners, imageCorners.length);
         mTempMatrix.mapPoints(unrotatedImageCorners);
 
+Log.d("isImageWrapCropBounds", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
         float[] unrotatedCropBoundsCorners = RectUtils.getCornersFromRect(mCropRect);
         mTempMatrix.mapPoints(unrotatedCropBoundsCorners);
 
+Log.d("isImageWrapCropBounds", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
+        return RectUtils.trapToRect(unrotatedImageCorners).contains(RectUtils.trapToRect(unrotatedCropBoundsCorners));
+    }
+
+    protected boolean isImageWrapCropBounds7(float[] imageCorners, RectF cropRect) {
+        mTempMatrix.reset();
+        mTempMatrix.setRotate(-getCurrentAngle());
+
+        float[] unrotatedImageCorners = Arrays.copyOf(imageCorners, imageCorners.length);
+        mTempMatrix.mapPoints(unrotatedImageCorners);
+
+Log.d("isImageWrapCropBounds7", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
+        float[] unrotatedCropBoundsCorners = RectUtils.getCornersFromRect(cropRect);
+        mTempMatrix.mapPoints(unrotatedCropBoundsCorners);
+
+Log.d("isImageWrapCropBounds7", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
         return RectUtils.trapToRect(unrotatedImageCorners).contains(RectUtils.trapToRect(unrotatedCropBoundsCorners));
     }
 

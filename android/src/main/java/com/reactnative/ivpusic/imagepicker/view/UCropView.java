@@ -12,6 +12,7 @@ import com.yalantis.ucrop.callback.CropBoundsChangeListener;
 import com.yalantis.ucrop.callback.OverlayViewChangeListener;
 
 import androidx.annotation.NonNull;
+import android.util.Log;
 
 public class UCropView extends FrameLayout {
 
@@ -34,7 +35,6 @@ public class UCropView extends FrameLayout {
         mGestureCropImageView.processStyledAttributes(a);
         a.recycle();
 
-
         setListenersToViews();
     }
 
@@ -48,7 +48,13 @@ public class UCropView extends FrameLayout {
         mViewOverlay.setOverlayViewChangeListener(new OverlayViewChangeListener() {
             @Override
             public void onCropRectUpdated(RectF cropRect) {
+              Log.d("myTag", "onCropRectUpdated"+cropRect);
                 mGestureCropImageView.setCropRect(cropRect);
+            }
+            @Override
+            public boolean onCropRectShouldUpdated(RectF cropRect) {
+              Log.d("myTag", "onCropRectShouldUpdated"+cropRect);
+                return mGestureCropImageView.isValidCropRect(cropRect);
             }
         });
     }

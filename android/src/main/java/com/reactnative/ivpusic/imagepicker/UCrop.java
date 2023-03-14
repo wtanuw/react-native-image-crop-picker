@@ -337,6 +337,7 @@ public static String bundleToString(Bundle bundle) {
         public static final String EXTRA_CROP_FRAME_STROKE_WIDTH = EXTRA_PREFIX + ".CropFrameStrokeWidth";
         public static final String EXTRA_CROP_CORNER_STROKE_WIDTH = EXTRA_PREFIX + ".CropCornerStrokeWidth";
         public static final String EXTRA_CROP_CORNER_STROKE_LENGTH = EXTRA_PREFIX + ".CropCornerStrokeLength";
+        public static final String EXTRA_STILL_IMAGE_CROPBOX_MOVE = EXTRA_PREFIX + ".StillImageCropboxMove";
 
         public static final String EXTRA_SHOW_CROP_GRID = EXTRA_PREFIX + ".ShowCropGrid";
         public static final String EXTRA_CROP_GRID_ROW_COUNT = EXTRA_PREFIX + ".CropGridRowCount";
@@ -476,6 +477,13 @@ public static String bundleToString(Bundle bundle) {
          */
         public void setCropCornerStrokeLength(@IntRange(from = 0) int width) {
             mOptionBundle.putInt(EXTRA_CROP_CORNER_STROKE_LENGTH, width);
+        }
+
+        /**
+         * @param stillImageCropboxMove - 
+         */
+        public void setStillImageCropboxMove(boolean stillImageCropboxMove) {
+            mOptionBundle.putBoolean(EXTRA_STILL_IMAGE_CROPBOX_MOVE, stillImageCropboxMove);
         }
 
         /**

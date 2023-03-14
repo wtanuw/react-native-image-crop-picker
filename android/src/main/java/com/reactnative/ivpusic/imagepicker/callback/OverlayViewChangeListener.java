@@ -8,5 +8,6 @@ import android.graphics.RectF;
 public interface OverlayViewChangeListener {
 
     void onCropRectUpdated(RectF cropRect);
+    boolean onCropRectShouldUpdated(RectF cropRect);
 
 }

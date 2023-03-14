@@ -23,6 +23,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
+import android.util.Log;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
@@ -45,6 +46,7 @@ public class OverlayView extends View {
 
     private final RectF mCropViewRect = new RectF();
     private final RectF mTempRect = new RectF();
+    private final RectF mShouldRect = new RectF();
 
     protected int mThisWidth, mThisHeight;
     protected float[] mCropGridCorners;
@@ -69,6 +71,7 @@ public class OverlayView extends View {
     private int mCropRectMinSize;
     private float mCropRectCornerTouchAreaLineLength;
     private float mCropRectCornerWidth = 3;
+    private boolean mStillImageCropboxMove = true;
 
     private OverlayViewChangeListener mCallback;
 
@@ -217,6 +220,10 @@ public class OverlayView extends View {
     public void setCropGridStrokeWidth(@IntRange(from = 0) int width) {
         mCropGridPaint.setStrokeWidth(width);
     }
+    public void setStillImageCropboxMove(boolean stillImageCropboxMove) {
+        mStillImageCropboxMove = stillImageCropboxMove;
+    }
+
 
     /**
      * Setter for crop frame color
@@ -324,9 +331,14 @@ public class OverlayView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (mCropViewRect.isEmpty() || mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE) {
             return false;
         }
+              Log.d("onTouchEvent", "-----------------");
+              Log.d("mCropViewRect", ""+mCropViewRect);
+              Log.d("mTempRect", ""+mTempRect);
+              Log.d("mShouldRect", ""+mShouldRect);
 
         float x = event.getX();
         float y = event.getY();
@@ -349,6 +361,49 @@ public class OverlayView extends View {
 
                 x = Math.min(Math.max(x, getPaddingLeft()), getWidth() - getPaddingRight());
                 y = Math.min(Math.max(y, getPaddingTop()), getHeight() - getPaddingBottom());
+
+              Log.d("myTag", "x"+x);
+              Log.d("myTag", "y"+y);
+                if (mStillImageCropboxMove) {
+                  float touchX = x;
+                  float touchY = y;
+                  mShouldRect.set(mCropViewRect);
+                  switch (mCurrentTouchCornerIndex) {
+                      // resize rectangle
+                      case 0:
+                          mShouldRect.set(touchX, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                          break;
+                      case 1:
+                          mShouldRect.set(mCropViewRect.left, touchY, touchX, mCropViewRect.bottom);
+                          break;
+                      case 2:
+                          mShouldRect.set(mCropViewRect.left, mCropViewRect.top, touchX, touchY);
+                          break;
+                      case 3:
+                          mShouldRect.set(touchX, mCropViewRect.top, mCropViewRect.right, touchY);
+                          break;
+                      // move rectangle
+                      case 4:
+                          mShouldRect.offset(touchX - mPreviousTouchX, touchY - mPreviousTouchY);
+                          if (mTempRect.left > getLeft() && mTempRect.top > getTop()
+                                  && mTempRect.right < getRight() && mTempRect.bottom < getBottom()) {
+                              // mCropViewRect.set(mTempRect);
+                              // updateGridPoints();
+                              // postInvalidate();
+                          }
+                  }
+              Log.d("myTag", "mShouldRect"+mShouldRect);
+                  if (mCallback != null) {
+                      boolean should = mCallback.onCropRectShouldUpdated(mShouldRect);
+              Log.d("myTag", "should "+should);
+                      if (should) {
+                updateCropViewRect(x, y);
+                      }
+                mPreviousTouchX = x;
+                mPreviousTouchY = y;
+                      return true;
+                  }
+                }
 
                 updateCropViewRect(x, y);
 

@@ -111,6 +111,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private int cropFrameWidth = 0;
     private int cropCornerLength = 0;
     private int cropCornerWidth = 0;
+    private boolean stillImageCropboxMove = false;
 
     private Uri mCameraCaptureURI;
     private String mCurrentMediaPath;
@@ -167,6 +168,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         cropFrameWidth = options.hasKey("cropFrameWidth") ? options.getInt("cropFrameWidth") : 0;
         cropCornerLength = options.hasKey("cropCornerLength") ? options.getInt("cropCornerLength") : 0;
         cropCornerWidth = options.hasKey("cropCornerWidth") ? options.getInt("cropCornerWidth") : 0;
+        stillImageCropboxMove = options.hasKey("stillImageCropboxMove") ? options.getBoolean("stillImageCropboxMove") : false;
         this.options = options;
     }
 
@@ -776,6 +778,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         options.setCropGridCornerColor(Color.parseColor(cropFrameColor));
         options.setCropCornerStrokeWidth(cropCornerWidth);
         options.setCropCornerStrokeLength(cropCornerLength);
+        options.setStillImageCropboxMove(stillImageCropboxMove);
 
         if (enableRotationGesture) {
             // UCropActivity.ALL = enable both rotation & scaling
@@ -783,6 +786,13 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
                     UCropActivity.ALL, // When 'scale'-tab active
                     UCropActivity.ALL, // When 'rotate'-tab active
                     UCropActivity.ALL  // When 'aspect ratio'-tab active
+            );
+        }
+        if (stillImageCropboxMove) {
+            options.setAllowedGestures(
+                    UCropActivity.NONE, // When 'scale'-tab active
+                    UCropActivity.NONE, // When 'rotate'-tab active
+                    UCropActivity.NONE  // When 'aspect ratio'-tab active
             );
         }
 
