@@ -61,7 +61,7 @@ class Compression {
         File imageDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         if (!imageDirectory.exists()) {
-            Log.d("image-crop-picker", "Pictures Directory is not existing. Will create this directory.");
+            // Log.d("image-crop-picker", "Pictures Directory is not existing. Will create this directory.");
             imageDirectory.mkdirs();
         }
 
@@ -119,15 +119,15 @@ class Compression {
         boolean isKnownMimeType = (bitmapOptions.outMimeType != null && knownMimes.contains(bitmapOptions.outMimeType.toLowerCase()));
 
         if (isLossLess && useOriginalWidth && useOriginalHeight && isKnownMimeType) {
-            Log.d("image-crop-picker", "Skipping image compression");
+            // Log.d("image-crop-picker", "Skipping image compression");
             return new File(originalImagePath);
         }
 
-        Log.d("image-crop-picker", "Image compression activated");
+        // Log.d("image-crop-picker", "Image compression activated");
 
         // compression quality
         int targetQuality = quality != null ? (int) (quality * 100) : 100;
-        Log.d("image-crop-picker", "Compressing image with quality " + targetQuality);
+        // Log.d("image-crop-picker", "Compressing image with quality " + targetQuality);
 
         if (maxWidth == null) maxWidth = bitmapOptions.outWidth;
         if (maxHeight == null) maxHeight = bitmapOptions.outHeight;

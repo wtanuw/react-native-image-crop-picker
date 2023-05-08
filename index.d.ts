@@ -338,13 +338,18 @@ declare module "react-native-image-crop-picker" {
          * @default Android: 1, iOS: 0.8
          */
         compressImageQuality?: number;
+        
         ratioLock?: boolean;
+        cropFrameLock?: boolean;
         ratioWidth?: number;
         ratioHeight?: number;
         cropFrameColor?: string;
         cropFrameWidth?: number;
         cropCornerLength?: number;
         cropCornerWidth?: number;
+        cropExpandWidth?: number;
+        cropExtraPadding?: number;
+        stillImageCropboxMove?: boolean;
     }
 
     type CropperOptions = ImageOptions & {

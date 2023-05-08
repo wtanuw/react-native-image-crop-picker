@@ -137,7 +137,7 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         mCroppedImageHeight = Math.round(mCropRect.height() / mCurrentScale);
 
         boolean shouldCrop = shouldCrop(mCroppedImageWidth, mCroppedImageHeight);
-        Log.i(TAG, "Should crop: " + shouldCrop);
+        // Log.i(TAG, "Should crop: " + shouldCrop);
 
         if (shouldCrop) {
             boolean cropped = cropCImg(mImageInputPath, mImageOutputPath,

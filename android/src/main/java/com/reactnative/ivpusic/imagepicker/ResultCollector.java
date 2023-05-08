@@ -44,12 +44,12 @@ class ResultCollector {
 
     synchronized private boolean isRequestValid() {
         if (resultSent) {
-            Log.w("image-crop-picker", "Skipping result, already sent...");
+            // Log.w("image-crop-picker", "Skipping result, already sent...");
             return false;
         }
 
         if (promise == null) {
-            Log.w("image-crop-picker", "Trying to notify success but promise is not set");
+            // Log.w("image-crop-picker", "Trying to notify success but promise is not set");
             return false;
         }
 
@@ -80,7 +80,7 @@ class ResultCollector {
             return;
         }
 
-        Log.e("image-crop-picker", "Promise rejected. " + message);
+        // Log.e("image-crop-picker", "Promise rejected. " + message);
         promise.reject(code, message);
         resultSent = true;
     }
@@ -90,7 +90,7 @@ class ResultCollector {
             return;
         }
 
-        Log.e("image-crop-picker", "Promise rejected. " + throwable.getMessage());
+        // Log.e("image-crop-picker", "Promise rejected. " + throwable.getMessage());
         promise.reject(code, throwable);
         resultSent = true;
     }

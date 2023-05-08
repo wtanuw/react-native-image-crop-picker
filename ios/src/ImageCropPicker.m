@@ -900,16 +900,21 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         if (ratioWidth.intValue > 0 && ratioHeight.intValue > 0) {
             cropVC.customAspectRatio = CGSizeMake(ratioWidth.intValue, ratioHeight.intValue);
         }
-        // cropFrameWidth: 0,
-        // cropCornerLength: 90,
-        // cropCornerWidth: 15,
+        NSNumber *cropFrameLock = [self.options objectForKey:@"cropFrameLock"];
         NSNumber *cropFrameWidth = [self.options objectForKey:@"cropFrameWidth"];
         NSNumber *cropCornerLength = [self.options objectForKey:@"cropCornerLength"];
         NSNumber *cropCornerWidth = [self.options objectForKey:@"cropCornerWidth"];
+        NSNumber *cropExpandWidth = [self.options objectForKey:@"cropExpandWidth"];
+        NSNumber *cropExtraPadding = [self.options objectForKey:@"cropExtraPadding"];
+        cropVC.cropFrameLock = cropFrameWidth.boolValue;
         cropVC.cropFrameWidth = cropFrameWidth.intValue;
         cropVC.cropCornerLength = cropCornerLength.intValue;
         cropVC.cropCornerWidth = cropCornerWidth.intValue;
+        cropVC.cropExpandWidth = cropExpandWidth.intValue;
+        cropVC.cropExtraPadding = cropExtraPadding.intValue;
         cropVC.cropFrameColor = [ImageCropPicker colorWithHexString:[[self options] objectForKey:@"cropFrameColor"]];
+        NSNumber *stillImageCropboxMove = [self.options objectForKey:@"stillImageCropboxMove"];
+        cropVC.stillImageCropboxMove = stillImageCropboxMove.boolValue;
         cropVC.delegate = self;
         
         cropVC.doneButtonTitle = [self.options objectForKey:@"cropperChooseText"];

@@ -129,11 +129,16 @@ public class CropImageView extends TransformImageView {
         //         cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
         // calculateImageScaleBounds();
         // setImageToWrapCropBounds();
-              Log.d("isValidCropRect", "cropRect"+cropRect);
+        // Log.d("isValidCropRect", "cropRect"+cropRect);
+        // Log.d("isValidCropRect", "padding"+ getPaddingLeft()+","+getPaddingTop());
         // mTargetAspectRatio = cropRect.width() / cropRect.height();
-        cropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
-                cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
-              Log.d("isValidCropRect", "cropRect"+cropRect);
+        cropRect.set(
+          cropRect.left - getPaddingLeft(), 
+          cropRect.top - getPaddingTop(),
+          cropRect.right - getPaddingRight(), 
+          cropRect.bottom - getPaddingBottom()
+        );
+        // Log.d("isValidCropRect", "cropRect_padding"+cropRect);
         if (true) {
 
             float currentX = mCurrentImageCenter[0];
@@ -150,17 +155,17 @@ public class CropImageView extends TransformImageView {
 
             final float[] tempCurrentImageCorners = Arrays.copyOf(mCurrentImageCorners, mCurrentImageCorners.length);
             mTempMatrix.mapPoints(tempCurrentImageCorners);
-Log.d("myTag", "tempCurrentImageCorners: " + Arrays.toString(tempCurrentImageCorners));
+// Log.d("myTag", "tempCurrentImageCorners: " + Arrays.toString(tempCurrentImageCorners));
             boolean willImageWrapCropBoundsAfterTranslate = isImageWrapCropBounds7(tempCurrentImageCorners, cropRect);
 
             if (willImageWrapCropBoundsAfterTranslate) {
-              Log.d("myTag", "true");
+            //   Log.d("myTag", "true");
               return true;
                 // final float[] imageIndents = calculateImageIndents();
                 // deltaX = -(imageIndents[0] + imageIndents[2]);
                 // deltaY = -(imageIndents[1] + imageIndents[3]);
             } else {
-              Log.d("myTag", "false");
+            //   Log.d("myTag", "false");
               return false;
 
                 // RectF tempCropRect = new RectF(mCropRect);
@@ -489,11 +494,11 @@ Log.d("myTag", "tempCurrentImageCorners: " + Arrays.toString(tempCurrentImageCor
         float[] unrotatedImageCorners = Arrays.copyOf(imageCorners, imageCorners.length);
         mTempMatrix.mapPoints(unrotatedImageCorners);
 
-Log.d("isImageWrapCropBounds", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
+// Log.d("isImageWrapCropBounds", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
         float[] unrotatedCropBoundsCorners = RectUtils.getCornersFromRect(mCropRect);
         mTempMatrix.mapPoints(unrotatedCropBoundsCorners);
 
-Log.d("isImageWrapCropBounds", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
+// Log.d("isImageWrapCropBounds", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
         return RectUtils.trapToRect(unrotatedImageCorners).contains(RectUtils.trapToRect(unrotatedCropBoundsCorners));
     }
 
@@ -504,11 +509,11 @@ Log.d("isImageWrapCropBounds", "unrotatedCropBoundsCorners: " + Arrays.toString(
         float[] unrotatedImageCorners = Arrays.copyOf(imageCorners, imageCorners.length);
         mTempMatrix.mapPoints(unrotatedImageCorners);
 
-Log.d("isImageWrapCropBounds7", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
+// Log.d("isImageWrapCropBounds7", "unrotatedImageCorners: " + Arrays.toString(unrotatedImageCorners));
         float[] unrotatedCropBoundsCorners = RectUtils.getCornersFromRect(cropRect);
         mTempMatrix.mapPoints(unrotatedCropBoundsCorners);
 
-Log.d("isImageWrapCropBounds7", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
+// Log.d("isImageWrapCropBounds7", "unrotatedCropBoundsCorners: " + Arrays.toString(unrotatedCropBoundsCorners));
         return RectUtils.trapToRect(unrotatedImageCorners).contains(RectUtils.trapToRect(unrotatedCropBoundsCorners));
     }
 

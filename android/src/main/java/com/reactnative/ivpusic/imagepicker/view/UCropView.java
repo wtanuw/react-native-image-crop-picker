@@ -13,11 +13,16 @@ import com.yalantis.ucrop.callback.OverlayViewChangeListener;
 
 import androidx.annotation.NonNull;
 import android.util.Log;
+import androidx.annotation.IntRange;
 
 public class UCropView extends FrameLayout {
+    private float mCropExpandWidth = 0;
+    private float mCropExtraPadding = 0;
 
     private GestureCropImageView mGestureCropImageView;
     private final OverlayView mViewOverlay;
+
+    private final RectF mTempRect = new RectF();
 
     public UCropView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -48,13 +53,15 @@ public class UCropView extends FrameLayout {
         mViewOverlay.setOverlayViewChangeListener(new OverlayViewChangeListener() {
             @Override
             public void onCropRectUpdated(RectF cropRect) {
-              Log.d("myTag", "onCropRectUpdated"+cropRect);
-                mGestureCropImageView.setCropRect(cropRect);
+            //   Log.d("myTag", "onCropRectUpdated"+cropRect);
+              mTempRect.set(cropRect);
+                mGestureCropImageView.setCropRect(mTempRect);
             }
             @Override
             public boolean onCropRectShouldUpdated(RectF cropRect) {
-              Log.d("myTag", "onCropRectShouldUpdated"+cropRect);
-                return mGestureCropImageView.isValidCropRect(cropRect);
+            //   Log.d("myTag", "onCropRectShouldUpdated"+cropRect);
+              mTempRect.set(cropRect);
+                return mGestureCropImageView.isValidCropRect(mTempRect);
             }
         });
     }
@@ -84,5 +91,16 @@ public class UCropView extends FrameLayout {
         setListenersToViews();
         mGestureCropImageView.setCropRect(getOverlayView().getCropViewRect());
         addView(mGestureCropImageView, 0);
+    }
+    
+    public void setCropExpandWidthPadding(@IntRange(from = 0) int width, @IntRange(from = 0) int padding) {
+        float unit = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_unit);
+        mCropExpandWidth = width*unit;
+
+        int totalpadding = (int)(padding*unit)+getResources().getDimensionPixelSize(R.dimen.ucrop_padding_crop_frame);
+        int horizontal = totalpadding+(int)mCropExpandWidth;
+        int vertical = padding;
+        mViewOverlay.setPadding(horizontal,vertical,horizontal,vertical);
+        mGestureCropImageView.setPadding(horizontal,vertical,horizontal,vertical);
     }
 }

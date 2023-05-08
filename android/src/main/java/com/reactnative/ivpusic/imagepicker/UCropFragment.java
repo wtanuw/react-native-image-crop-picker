@@ -228,10 +228,19 @@ public class UCropFragment extends Fragment {
 
         mOverlayView.setShowCropFrame(bundle.getBoolean(UCrop.Options.EXTRA_SHOW_CROP_FRAME, OverlayView.DEFAULT_SHOW_CROP_FRAME));
         mOverlayView.setCropFrameColor(bundle.getInt(UCrop.Options.EXTRA_CROP_FRAME_COLOR, getResources().getColor(R.color.ucrop_color_default_crop_frame)));
+        mOverlayView.setRatioLock(bundle.getBoolean(UCrop.Options.EXTRA_RATIO_LOCK, OverlayView.DEFAULT_RATIO_LOCK));
+        mOverlayView.setCropFrameLock(bundle.getBoolean(UCrop.Options.EXTRA_CROP_FRAME_LOCK, OverlayView.DEFAULT_CROP_FRAME_LOCK));
         mOverlayView.setCropFrameStrokeWidth(bundle.getInt(UCrop.Options.EXTRA_CROP_FRAME_STROKE_WIDTH, getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_frame_stoke_width)));
         mOverlayView.setCropCornerStrokeWidth(bundle.getInt(UCrop.Options.EXTRA_CROP_CORNER_STROKE_WIDTH, getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_frame_stoke_width)));
         mOverlayView.setCropCornerStrokeLength(bundle.getInt(UCrop.Options.EXTRA_CROP_CORNER_STROKE_LENGTH, getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_area_line_length)));
-
+        
+        mUCropView.setCropExpandWidthPadding(bundle.getInt(UCrop.Options.EXTRA_CROP_EXPAND_WIDTH, 0), bundle.getInt(UCrop.Options.EXTRA_CROP_EXTRA_PADDING, 0));
+        mOverlayView.setCropExpandWidth(bundle.getInt(UCrop.Options.EXTRA_CROP_EXPAND_WIDTH, 0));
+        mOverlayView.setStillImageCropboxMove(bundle.getBoolean(UCrop.Options.EXTRA_STILL_IMAGE_CROPBOX_MOVE, false));
+        if (bundle.getBoolean(UCrop.Options.EXTRA_STILL_IMAGE_CROPBOX_MOVE, false)) {
+          mGestureCropImageView.setGestureEnabled(false);
+        }
+        
         mOverlayView.setShowCropGrid(bundle.getBoolean(UCrop.Options.EXTRA_SHOW_CROP_GRID, OverlayView.DEFAULT_SHOW_CROP_GRID));
         mOverlayView.setCropGridRowCount(bundle.getInt(UCrop.Options.EXTRA_CROP_GRID_ROW_COUNT, OverlayView.DEFAULT_CROP_GRID_ROW_COUNT));
         mOverlayView.setCropGridColumnCount(bundle.getInt(UCrop.Options.EXTRA_CROP_GRID_COLUMN_COUNT, OverlayView.DEFAULT_CROP_GRID_COLUMN_COUNT));

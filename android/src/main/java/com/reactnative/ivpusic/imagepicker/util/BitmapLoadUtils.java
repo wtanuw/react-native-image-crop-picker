@@ -48,7 +48,7 @@ public class BitmapLoadUtils {
                 bitmap = converted;
             }
         } catch (OutOfMemoryError error) {
-            Log.e(TAG, "transformBitmap: ", error);
+            // Log.e(TAG, "transformBitmap: ", error);
         }
         return bitmap;
     }
@@ -79,7 +79,7 @@ public class BitmapLoadUtils {
             orientation = new ImageHeaderParser(stream).getOrientation();
             close(stream);
         } catch (IOException e) {
-            Log.e(TAG, "getExifOrientation: " + imageUri.toString(), e);
+            // Log.e(TAG, "getExifOrientation: " + imageUri.toString(), e);
         }
         return orientation;
     }
@@ -158,7 +158,7 @@ public class BitmapLoadUtils {
             maxBitmapSize = Math.min(maxBitmapSize, maxTextureSize);
         }
 
-        Log.d(TAG, "maxBitmapSize: " + maxBitmapSize);
+        // Log.d(TAG, "maxBitmapSize: " + maxBitmapSize);
         return maxBitmapSize;
     }
 

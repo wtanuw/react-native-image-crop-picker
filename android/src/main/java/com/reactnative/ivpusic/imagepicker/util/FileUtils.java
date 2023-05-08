@@ -115,7 +115,7 @@ public class FileUtils {
                 return cursor.getString(column_index);
             }
         } catch (IllegalArgumentException ex) {
-            Log.i(TAG, String.format(Locale.getDefault(), "getDataColumn: _data - [%s]", ex.getMessage()));
+            // Log.i(TAG, String.format(Locale.getDefault(), "getDataColumn: _data - [%s]", ex.getMessage()));
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -163,7 +163,7 @@ public class FileUtils {
                                 Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
                         return getDataColumn(context, contentUri, null, null);
                     } catch (NumberFormatException e) {
-                        Log.i(TAG, e.getMessage());
+                        // Log.i(TAG, e.getMessage());
                         return null;
                     }
                 }

@@ -112,10 +112,10 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
                 if (checkSize(decodeSampledBitmap, options)) continue;
                 decodeAttemptSuccess = true;
             } catch (OutOfMemoryError error) {
-                Log.e(TAG, "doInBackground: BitmapFactory.decodeFileDescriptor: ", error);
+                // Log.e(TAG, "doInBackground: BitmapFactory.decodeFileDescriptor: ", error);
                 options.inSampleSize *= 2;
             } catch (IOException e) {
-                Log.e(TAG, "doInBackground: ImageDecoder.createSource: ", e);
+                // Log.e(TAG, "doInBackground: ImageDecoder.createSource: ", e);
                 return new BitmapWorkerResult(new IllegalArgumentException("Bitmap could not be decoded from the Uri: [" + mInputUri + "]", e));
             }
         }
@@ -146,29 +146,29 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
 
     private void processInputUri() throws NullPointerException, IOException {
         String inputUriScheme = mInputUri.getScheme();
-        Log.d(TAG, "Uri scheme: " + inputUriScheme);
+        // Log.d(TAG, "Uri scheme: " + inputUriScheme);
         if ("http".equals(inputUriScheme) || "https".equals(inputUriScheme)) {
             try {
                 downloadFile(mInputUri, mOutputUri);
             } catch (NullPointerException | IOException e) {
-                Log.e(TAG, "Downloading failed", e);
+                // Log.e(TAG, "Downloading failed", e);
                 throw e;
             }
         } else if ("content".equals(inputUriScheme)) {
             try {
                 copyFile(mInputUri, mOutputUri);
             } catch (NullPointerException | IOException e) {
-                Log.e(TAG, "Copying failed", e);
+                // Log.e(TAG, "Copying failed", e);
                 throw e;
             }
         } else if (!"file".equals(inputUriScheme)) {
-            Log.e(TAG, "Invalid Uri scheme " + inputUriScheme);
+            // Log.e(TAG, "Invalid Uri scheme " + inputUriScheme);
             throw new IllegalArgumentException("Invalid Uri scheme" + inputUriScheme);
         }
     }
 
     private void copyFile(@NonNull Uri inputUri, @Nullable Uri outputUri) throws NullPointerException, IOException {
-        Log.d(TAG, "copyFile");
+        // Log.d(TAG, "copyFile");
 
         if (outputUri == null) {
             throw new NullPointerException("Output Uri is null - cannot copy image");
@@ -199,7 +199,7 @@ public class BitmapLoadTask extends AsyncTask<Void, Void, BitmapLoadTask.BitmapW
     }
 
     private void downloadFile(@NonNull Uri inputUri, @Nullable Uri outputUri) throws NullPointerException, IOException {
-        Log.d(TAG, "downloadFile");
+        // Log.d(TAG, "downloadFile");
 
         if (outputUri == null) {
             throw new NullPointerException("Output Uri is null - cannot download image");

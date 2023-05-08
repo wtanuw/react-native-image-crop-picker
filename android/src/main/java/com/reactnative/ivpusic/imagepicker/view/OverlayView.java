@@ -43,6 +43,8 @@ public class OverlayView extends View {
     public static final int DEFAULT_FREESTYLE_CROP_MODE = FREESTYLE_CROP_MODE_DISABLE;
     public static final int DEFAULT_CROP_GRID_ROW_COUNT = 2;
     public static final int DEFAULT_CROP_GRID_COLUMN_COUNT = 2;
+    public static final boolean DEFAULT_RATIO_LOCK = false;
+    public static final boolean DEFAULT_CROP_FRAME_LOCK = false;
 
     private final RectF mCropViewRect = new RectF();
     private final RectF mTempRect = new RectF();
@@ -71,7 +73,10 @@ public class OverlayView extends View {
     private int mCropRectMinSize;
     private float mCropRectCornerTouchAreaLineLength;
     private float mCropRectCornerWidth = 3;
+    private float mCropExpandWidth = 0;
     private boolean mStillImageCropboxMove = true;
+    private boolean mRatioLock = DEFAULT_RATIO_LOCK;
+    private boolean mCropFrameLock = DEFAULT_CROP_FRAME_LOCK;
 
     private OverlayViewChangeListener mCallback;
 
@@ -198,6 +203,14 @@ public class OverlayView extends View {
         mCropFramePaint.setStrokeWidth(width*unit);
     }
 
+    public void setRatioLock(boolean lock) {
+        mRatioLock = lock;
+    }
+
+    public void setCropFrameLock(boolean lock) {
+        mCropFrameLock = lock;
+    }
+
     /**
      * Setter for crop grid stroke width
      */
@@ -220,6 +233,12 @@ public class OverlayView extends View {
     public void setCropGridStrokeWidth(@IntRange(from = 0) int width) {
         mCropGridPaint.setStrokeWidth(width);
     }
+    
+    public void setCropExpandWidth(@IntRange(from = 0) int width) {
+        float unit = getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_rect_corner_touch_unit);
+        mCropExpandWidth = width*unit;
+    }
+    
     public void setStillImageCropboxMove(boolean stillImageCropboxMove) {
         mStillImageCropboxMove = stillImageCropboxMove;
     }
@@ -253,6 +272,7 @@ public class OverlayView extends View {
      */
     public void setTargetAspectRatio(final float targetAspectRatio) {
         mTargetAspectRatio = targetAspectRatio;
+            //   Log.d("settarget", "-*-*-*-*-*-*-*-*-*"+targetAspectRatio);
         if (mThisWidth > 0) {
             setupCropBounds();
             postInvalidate();
@@ -332,13 +352,14 @@ public class OverlayView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (mCropViewRect.isEmpty() || mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE) {
+        if (mCropViewRect.isEmpty() 
+        || (mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE && !mRatioLock)) {
             return false;
         }
-              Log.d("onTouchEvent", "-----------------");
-              Log.d("mCropViewRect", ""+mCropViewRect);
-              Log.d("mTempRect", ""+mTempRect);
-              Log.d("mShouldRect", ""+mShouldRect);
+            //   Log.d("onTouchEvent", "-----------------");
+            //   Log.d("mCropViewRect", ""+mCropViewRect);
+            //   Log.d("mTempRect", ""+mTempRect);
+            //   Log.d("mShouldRect", ""+mShouldRect);
 
         float x = event.getX();
         float y = event.getY();
@@ -357,30 +378,128 @@ public class OverlayView extends View {
         }
 
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_MOVE) {
+          if (!mStillImageCropboxMove) {
             if (event.getPointerCount() == 1 && mCurrentTouchCornerIndex != -1) {
 
                 x = Math.min(Math.max(x, getPaddingLeft()), getWidth() - getPaddingRight());
                 y = Math.min(Math.max(y, getPaddingTop()), getHeight() - getPaddingBottom());
 
-              Log.d("myTag", "x"+x);
-              Log.d("myTag", "y"+y);
-                if (mStillImageCropboxMove) {
+                updateCropViewRect(x, y);
+
+                mPreviousTouchX = x;
+                mPreviousTouchY = y;
+
+                return true;
+            }
+          }
+          if (mStillImageCropboxMove) {
+               
+            if (event.getPointerCount() == 1 && mCurrentTouchCornerIndex != -1) {
+
+                x = Math.min(Math.max(x, getPaddingLeft()), getWidth() - getPaddingRight());
+                y = Math.min(Math.max(y, getPaddingTop()), getHeight() - getPaddingBottom());
+
+            //   Log.d("myTag", "x"+x);
+            //   Log.d("myTag", "y"+y);
+                
                   float touchX = x;
                   float touchY = y;
                   mShouldRect.set(mCropViewRect);
+                        if (mRatioLock) {
+                          mShouldSetupCropBounds = true;
+                        }
                   switch (mCurrentTouchCornerIndex) {
                       // resize rectangle
                       case 0:
-                          mShouldRect.set(touchX, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                      mShouldRect.set(touchX, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                        if (mRatioLock) {
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.bottom-newHeight, mShouldRect.right, mShouldRect.bottom);
+                         float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          mShouldRect.set(mCropViewRect.right-newWidth, mShouldRect.top, mShouldRect.right, mShouldRect.bottom);                          
+                         }
                           break;
                       case 1:
                           mShouldRect.set(mCropViewRect.left, touchY, touchX, mCropViewRect.bottom);
+                        if (mRatioLock) {
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.bottom-newHeight, mShouldRect.right, mShouldRect.bottom);
+                         float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          mShouldRect.set(mCropViewRect.left, mShouldRect.top, mShouldRect.left+newWidth, mShouldRect.bottom);                          
+                         }
                           break;
                       case 2:
                           mShouldRect.set(mCropViewRect.left, mCropViewRect.top, touchX, touchY);
+                        if (mRatioLock) {
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.top, mShouldRect.right, mShouldRect.top+newHeight);
+                         float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          mShouldRect.set(mCropViewRect.left, mShouldRect.top, mShouldRect.left+newWidth, mShouldRect.bottom);                          
+                         }
                           break;
                       case 3:
                           mShouldRect.set(touchX, mCropViewRect.top, mCropViewRect.right, touchY);
+                          if (mRatioLock) {
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.top, mShouldRect.right, mShouldRect.top+newHeight);
+                         float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          mShouldRect.set(mCropViewRect.right-newWidth, mShouldRect.top, mShouldRect.right, mShouldRect.bottom);                          
+                         }
+                          break;
+                      case 5:
+                        if (mRatioLock) {
+                          mShouldRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                          float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          float half = (float)(newWidth*0.5);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mShouldRect"+mShouldRect +" wxh = "+mShouldRect.width()+" "+mShouldRect.height());
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mShouldRect.height"+mShouldRect.height());
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mTargetAspectRatio"+mTargetAspectRatio);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-newWidth"+newWidth);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-half"+half);
+                          mShouldRect.set(mCropViewRect.centerX()-half, mShouldRect.top, mCropViewRect.centerX()+half, mShouldRect.bottom);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mShouldRect"+mShouldRect+" wxh = "+mShouldRect.width()+" "+mShouldRect.height());
+                          // mShouldRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                        } else {
+                          mShouldRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                        }
+                          break;
+                      case 6:
+                        if (mRatioLock) {
+                          mShouldRect.set(mCropViewRect.left, mCropViewRect.top, touchX, mCropViewRect.bottom);
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          float half = (float)(newHeight*0.5);
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.centerY()-half, mShouldRect.right, mCropViewRect.centerY()+half);
+                          // mShouldRect.set(mCropViewRect.left, mCropViewRect.top, touchX, mCropViewRect.bottom);
+                        } else {
+                          mShouldRect.set(mCropViewRect.left, mCropViewRect.top, touchX, mCropViewRect.bottom);
+                        }
+                          break;
+                      case 7:
+                        if (mRatioLock) {
+                          mShouldRect.set(mCropViewRect.left, mCropViewRect.top, mCropViewRect.right, touchY);
+                          float newWidth = mShouldRect.height() * mTargetAspectRatio;
+                          float half = (float)(newWidth*0.5);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mShouldRect"+mShouldRect +" wxh = "+mShouldRect.width()+" "+mShouldRect.height());
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mShouldRect.height"+mShouldRect.height());
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-mTargetAspectRatio"+mTargetAspectRatio);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-newWidth"+newWidth);
+                        //   Log.d("watcrop", "*-*-*-*-*-*-*-*-half"+half);
+                          mShouldRect.set(mCropViewRect.centerX()-half, mShouldRect.top, mCropViewRect.centerX()+half, mShouldRect.bottom);
+                          // mShouldRect.set(mCropViewRect.left, mCropViewRect.top, mCropViewRect.right, touchY);
+                        } else {
+                          mShouldRect.set(mCropViewRect.left, mCropViewRect.top, mCropViewRect.right, touchY);
+                        }
+                          break;
+                      case 8:
+                        if (mRatioLock) {
+                          mShouldRect.set(touchX, mCropViewRect.top, mCropViewRect.right, mCropViewRect.bottom);
+                          float newHeight = mShouldRect.width() / mTargetAspectRatio;
+                          float half = (float)(newHeight*0.5);
+                          mShouldRect.set(mShouldRect.left, mCropViewRect.centerY()-half, mShouldRect.right, mCropViewRect.centerY()+half);
+                          // mShouldRect.set(touchX, mCropViewRect.top, mCropViewRect.right, mCropViewRect.bottom);
+                        } else {
+                          mShouldRect.set(touchX, mCropViewRect.top, mCropViewRect.right, mCropViewRect.bottom);
+                        }
                           break;
                       // move rectangle
                       case 4:
@@ -392,19 +511,29 @@ public class OverlayView extends View {
                               // postInvalidate();
                           }
                   }
-              Log.d("myTag", "mShouldRect"+mShouldRect);
+                //   Log.d("ACTION_MOVE", "mShouldRect"+mShouldRect +" wxh = "+mShouldRect.width()+" "+mShouldRect.height());
                   if (mCallback != null) {
                       boolean should = mCallback.onCropRectShouldUpdated(mShouldRect);
-              Log.d("myTag", "should "+should);
+                    //   Log.d("ACTION_MOVE", "should "+should);
                       if (should) {
-                updateCropViewRect(x, y);
+                        // Log.d("ACTION_MOVE", "mShouldRect"+mShouldRect +" wxh = "+mShouldRect.width()+" "+mShouldRect.height());
+                        if (mCurrentTouchCornerIndex == 4){
+                          if (!mCropFrameLock) {
+                            updateCropViewRect(x,y);
+                          }
+                        } else {
+                          updateCropViewRect(mShouldRect);
+                        }
+                      } else {
+                        mPreviousTouchX = x;
+                        mPreviousTouchY = y;
+                        return true;
                       }
-                mPreviousTouchX = x;
-                mPreviousTouchY = y;
-                      return true;
+                        mPreviousTouchX = x;
+                        mPreviousTouchY = y;
+                        return true;
                   }
-                }
-
+                // assume to be alway should
                 updateCropViewRect(x, y);
 
                 mPreviousTouchX = x;
@@ -412,6 +541,7 @@ public class OverlayView extends View {
 
                 return true;
             }
+          }
         }
 
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
@@ -429,15 +559,15 @@ public class OverlayView extends View {
 
     /**
      * * The order of the corners is:
-     * 0------->1
-     * ^        |
-     * |   4    |
-     * |        v
-     * 3<-------2
+     * 0------->1             0---5--->1
+     * ^        |             ^        |
+     * |   4    |             8   4    6
+     * |        v             |        v
+     * 3<-------2             3<--7----2
      */
     private void updateCropViewRect(float touchX, float touchY) {
         mTempRect.set(mCropViewRect);
-
+        if (!mStillImageCropboxMove) {
         switch (mCurrentTouchCornerIndex) {
             // resize rectangle
             case 0:
@@ -463,6 +593,51 @@ public class OverlayView extends View {
                 }
                 return;
         }
+        }
+        if (mStillImageCropboxMove) {
+        switch (mCurrentTouchCornerIndex) {
+            // resize rectangle corner
+            case 0:
+                mTempRect.set(touchX, touchY, mCropViewRect.right, mCropViewRect.bottom);
+                break;
+            case 1:
+                mTempRect.set(mCropViewRect.left, touchY, touchX, mCropViewRect.bottom);
+                break;
+            case 2:
+                mTempRect.set(mCropViewRect.left, mCropViewRect.top, touchX, touchY);
+                break;
+            case 3:
+                mTempRect.set(touchX, mCropViewRect.top, mCropViewRect.right, touchY);
+                break;
+            // move rectangle
+            case 4:
+                mTempRect.offset(touchX - mPreviousTouchX, touchY - mPreviousTouchY);
+                if (mTempRect.left > getLeft() && mTempRect.top > getTop()
+                        && mTempRect.right < getRight() && mTempRect.bottom < getBottom()) {
+                    mCropViewRect.set(mTempRect);
+                    updateGridPoints();
+                    postInvalidate();
+                }
+                return;
+            // resize rect edge
+            case 5:
+            if (mRatioLock) {
+                mTempRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+            } else {
+                mTempRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+            }  
+                break;
+            case 6:
+                mTempRect.set(mCropViewRect.left, mCropViewRect.top, touchX, mCropViewRect.bottom);
+                break;
+            case 7:
+                mTempRect.set(mCropViewRect.left, mCropViewRect.top, mCropViewRect.right, touchY);
+                break;
+            case 8:
+                mTempRect.set(touchX, mCropViewRect.top, mCropViewRect.right, mCropViewRect.bottom);
+                break;
+        }
+        }
 
         boolean changeHeight = mTempRect.height() >= mCropRectMinSize;
         boolean changeWidth = mTempRect.width() >= mCropRectMinSize;
@@ -478,13 +653,101 @@ public class OverlayView extends View {
         }
     }
 
+    private void updateCropViewRect(RectF expectRect) {
+        mTempRect.set(mCropViewRect);
+        if (!mStillImageCropboxMove) {
+        }
+        if (mStillImageCropboxMove) {
+                mTempRect.set(expectRect);
+        switch (mCurrentTouchCornerIndex) {
+            // resize rectangle corner
+            case 0:
+                mTempRect.set(expectRect);
+                break;
+            case 1:
+                mTempRect.set(expectRect);
+                break;
+            case 2:
+                mTempRect.set(expectRect);
+                break;
+            case 3:
+                mTempRect.set(expectRect);
+                break;
+            // move rectangle
+            case 4:
+                // mTempRect.offset(touchX - mPreviousTouchX, touchY - mPreviousTouchY);
+                // if (mTempRect.left > getLeft() && mTempRect.top > getTop()
+                //         && mTempRect.right < getRight() && mTempRect.bottom < getBottom()) {
+                //     mCropViewRect.set(mTempRect);
+                //     updateGridPoints();
+                //     postInvalidate();
+                // }
+                return;
+            // resize rect edge
+            case 5: 
+                  
+            if (mRatioLock) {
+                mTempRect.set(expectRect);
+                // mTempRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+            } else {
+                mTempRect.set(expectRect);
+                // mTempRect.set(mCropViewRect.left, touchY, mCropViewRect.right, mCropViewRect.bottom);
+            }  
+                break;
+            case 6:
+                mTempRect.set(expectRect);
+                break;
+            case 7:
+                mTempRect.set(expectRect);
+                break;
+            case 8:
+                mTempRect.set(expectRect);
+                break;
+        }
+        }
+// Log.d("myTag", "updateCropViewRect mCropViewRect"+mCropViewRect +" wxh = "+mCropViewRect.width()+" "+mCropViewRect.height());
+//             Log.d("myTag", "updateCropViewRect mTempRect"+mTempRect +" wxh = "+mTempRect.width()+" "+mTempRect.height());
+//             Log.d("myTag", "updateCropViewRect expectRect"+expectRect +" wxh = "+expectRect.width()+" "+expectRect.height());
+            
+        boolean changeHeight = mTempRect.height() >= mCropRectMinSize;
+        boolean changeWidth = mTempRect.width() >= mCropRectMinSize;
+        if (!mRatioLock) {
+        mCropViewRect.set(
+                changeWidth ? mTempRect.left : mCropViewRect.left,
+                changeHeight ? mTempRect.top : mCropViewRect.top,
+                changeWidth ? mTempRect.right : mCropViewRect.right,
+                changeHeight ? mTempRect.bottom : mCropViewRect.bottom);
+        } else {
+        boolean changeHeight2 = mTempRect.width()*mTargetAspectRatio >= mCropRectMinSize;
+        boolean changeWidth2 = mTempRect.height()/mTargetAspectRatio >= mCropRectMinSize;
+          if (changeWidth && changeHeight) {
+        // Log.d("watcrop", "*-*-*-*-*-*-*-*-changet 1  "+mTempRect.height()+" min"+mCropRectMinSize+"   "+mTempRect.width()+" min"+mCropRectMinSize);
+        mCropViewRect.set(mTempRect);
+          } else if (changeWidth && changeHeight2) {
+        // Log.d("watcrop", "*-*-*-*-*-*-*-*-changet 2  "+mCropViewRect.height()+" min"+mCropRectMinSize+"   "+mCropViewRect.width()+" min"+mCropRectMinSize);
+        mCropViewRect.set(mTempRect);
+          } else if (changeWidth2 && changeHeight) {
+        // Log.d("watcrop", "*-*-*-*-*-*-*-*-changet 3  "+mCropViewRect.height()+" min"+mCropRectMinSize+"   "+mCropViewRect.width()+" min"+mCropRectMinSize);
+        mCropViewRect.set(mTempRect);
+          } else {
+        // Log.d("watcrop", "*-*-*-*-*-*-*-*-changet 4   "+mCropViewRect.height()+" min"+mCropRectMinSize+"   "+mCropViewRect.width()+" min"+mCropRectMinSize);
+        // mCropViewRect.set(mCropViewRect);
+          }
+        }
+
+        if (changeHeight || changeWidth) {
+            updateGridPoints();
+            postInvalidate();
+        }
+    }
+
     /**
      * * The order of the corners in the float array is:
-     * 0------->1
-     * ^        |
-     * |   4    |
-     * |        v
-     * 3<-------2
+     * 0------->1             0---5--->1
+     * ^        |             ^        |
+     * |   4    |             8   4    6
+     * |        v             |        v
+     * 3<-------2             3<--7----2
      *
      * @return - index of corner that is being dragged
      */
@@ -499,8 +762,32 @@ public class OverlayView extends View {
                 closestPointIndex = i / 2;
             }
         }
+        if (closestPointIndex != -1) {
+          return closestPointIndex;
+        }
+        for (int i = 0; i < 8; i += 4) {
+            double distanceToCorner = Math.sqrt(Math.pow(touchY - mCropGridCorners[i + 1], 2));
+            if (distanceToCorner < closestPointDistance) {
+                closestPointDistance = distanceToCorner;
+                closestPointIndex = 5 + i / 2;
+            }
+        }
+        for (int i = 2; i < 8; i += 4) {
+            double distanceToCorner = Math.sqrt(Math.pow(touchX - mCropGridCorners[i], 2));
+            if (distanceToCorner < closestPointDistance) {
+                closestPointDistance = distanceToCorner;
+                closestPointIndex = 5 + i / 2;
+            }
+        }
+        if (closestPointIndex != -1) {
+          return closestPointIndex;
+        }
 
         if (mFreestyleCropMode == FREESTYLE_CROP_MODE_ENABLE && closestPointIndex < 0 && mCropViewRect.contains(touchX, touchY)) {
+            return 4;
+        }
+        // || (mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE && !mRatioLock)) {
+        if (mFreestyleCropMode == FREESTYLE_CROP_MODE_DISABLE && mRatioLock && closestPointIndex < 0 && mCropViewRect.contains(touchX, touchY)) {
             return 4;
         }
 
@@ -577,7 +864,9 @@ public class OverlayView extends View {
         }
 
         if (mShowCropFrame) {
-            canvas.drawRect(mCropViewRect, mCropFramePaint);
+            mTempRect.set(mCropViewRect);
+            mTempRect.inset(-mCropExpandWidth,0);
+            canvas.drawRect(mTempRect, mCropFramePaint);
         }
         
         mCropFrameCornersPaint.setStrokeWidth(mCropRectCornerWidth);
@@ -586,6 +875,9 @@ public class OverlayView extends View {
             canvas.save();
 
             mTempRect.set(mCropViewRect);
+            mTempRect.inset(-mCropExpandWidth,0);
+
+            mTempRect.set(mTempRect);
             mTempRect.inset(mCropRectCornerTouchAreaLineLength, -mCropRectCornerTouchAreaLineLength);
             canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
 
@@ -593,7 +885,10 @@ public class OverlayView extends View {
             mTempRect.inset(-mCropRectCornerTouchAreaLineLength, mCropRectCornerTouchAreaLineLength);
             canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
 
-            canvas.drawRect(mCropViewRect, mCropFrameCornersPaint);
+            mTempRect.set(mCropViewRect);
+          mTempRect.inset(-mCropExpandWidth,0);
+
+            canvas.drawRect(mTempRect, mCropFrameCornersPaint);
 
             canvas.restore();
         }

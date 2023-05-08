@@ -69,9 +69,9 @@ public class UCrop {
     private UCrop(@NonNull Uri source, @NonNull Uri destination) {
         mCropIntent = new Intent();
         mCropOptionsBundle = new Bundle();
-        Log.v("ucrop", "*-*-*-*-*-*-*-*-");
-        Log.v("ucrop", source.toString());
-        Log.v("ucrop",destination.toString());
+        // Log.v("ucrop", "*-*-*-*-*-*-*-*-");
+        // Log.v("ucrop", source.toString());
+        // Log.v("ucrop",destination.toString());
         mCropOptionsBundle.putParcelable(EXTRA_INPUT_URI, source);
         mCropOptionsBundle.putParcelable(EXTRA_OUTPUT_URI, destination);
     }
@@ -334,9 +334,13 @@ public static String bundleToString(Bundle bundle) {
 
         public static final String EXTRA_SHOW_CROP_FRAME = EXTRA_PREFIX + ".ShowCropFrame";
         public static final String EXTRA_CROP_FRAME_COLOR = EXTRA_PREFIX + ".CropFrameColor";
+        public static final String EXTRA_RATIO_LOCK = EXTRA_PREFIX + ".RatioLock";
+        public static final String EXTRA_CROP_FRAME_LOCK = EXTRA_PREFIX + ".CropFrameLock";
         public static final String EXTRA_CROP_FRAME_STROKE_WIDTH = EXTRA_PREFIX + ".CropFrameStrokeWidth";
         public static final String EXTRA_CROP_CORNER_STROKE_WIDTH = EXTRA_PREFIX + ".CropCornerStrokeWidth";
         public static final String EXTRA_CROP_CORNER_STROKE_LENGTH = EXTRA_PREFIX + ".CropCornerStrokeLength";
+        public static final String EXTRA_CROP_EXPAND_WIDTH = EXTRA_PREFIX + ".CropExpandWidth";
+        public static final String EXTRA_CROP_EXTRA_PADDING = EXTRA_PREFIX + ".cropExtraPadding";
         public static final String EXTRA_STILL_IMAGE_CROPBOX_MOVE = EXTRA_PREFIX + ".StillImageCropboxMove";
 
         public static final String EXTRA_SHOW_CROP_GRID = EXTRA_PREFIX + ".ShowCropGrid";
@@ -465,18 +469,40 @@ public static String bundleToString(Bundle bundle) {
             mOptionBundle.putInt(EXTRA_CROP_FRAME_STROKE_WIDTH, width);
         }
 
+        public void setRatioLock(boolean lock) {
+            mOptionBundle.putBoolean(EXTRA_RATIO_LOCK, lock);
+        }
+
+        public void setCropFrameLock(boolean lock) {
+            mOptionBundle.putBoolean(EXTRA_CROP_FRAME_LOCK, lock);
+        }
+
         /**
-         * @param width - desired width of crop frame line in pixels
+         * @param width - 
          */
         public void setCropCornerStrokeWidth(@IntRange(from = 0) int width) {
             mOptionBundle.putInt(EXTRA_CROP_CORNER_STROKE_WIDTH, width);
         }
 
         /**
-         * @param width - desired width of crop frame line in pixels
+         * @param width - 
          */
         public void setCropCornerStrokeLength(@IntRange(from = 0) int width) {
             mOptionBundle.putInt(EXTRA_CROP_CORNER_STROKE_LENGTH, width);
+        }
+
+        /**
+         * @param width - 
+         */
+        public void setCropExpandWidth(@IntRange(from = 0) int width) {
+            mOptionBundle.putInt(EXTRA_CROP_EXPAND_WIDTH, width);
+        }
+
+        /**
+         * @param padding - 
+         */
+        public void setCropExtraPadding(@IntRange(from = 0) int padding) {
+            mOptionBundle.putInt(EXTRA_CROP_EXTRA_PADDING, padding);
         }
 
         /**

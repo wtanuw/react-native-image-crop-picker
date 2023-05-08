@@ -92,7 +92,7 @@ public class TransformImageView extends AppCompatImageView {
         if (scaleType == ScaleType.MATRIX) {
             super.setScaleType(scaleType);
         } else {
-            Log.w(TAG, "Invalid ScaleType. Only ScaleType.MATRIX can be used");
+            // Log.w(TAG, "Invalid ScaleType. Only ScaleType.MATRIX can be used");
         }
     }
 
@@ -154,7 +154,7 @@ public class TransformImageView extends AppCompatImageView {
 
                     @Override
                     public void onFailure(@NonNull Exception bitmapWorkerException) {
-                        Log.e(TAG, "onFailure: setImageUri", bitmapWorkerException);
+                        // Log.e(TAG, "onFailure: setImageUri", bitmapWorkerException);
                         if (mTransformImageListener != null) {
                             mTransformImageListener.onLoadFailure(bitmapWorkerException);
                         }
@@ -289,7 +289,7 @@ public class TransformImageView extends AppCompatImageView {
         float w = drawable.getIntrinsicWidth();
         float h = drawable.getIntrinsicHeight();
 
-        Log.d(TAG, String.format("Image size: [%d:%d]", (int) w, (int) h));
+        // Log.d(TAG, String.format("Image size: [%d:%d]", (int) w, (int) h));
 
         RectF initialImageRect = new RectF(0, 0, w, h);
         mInitialImageCorners = RectUtils.getCornersFromRect(initialImageRect);
@@ -324,7 +324,7 @@ public class TransformImageView extends AppCompatImageView {
         float y = getMatrixValue(matrix, Matrix.MTRANS_Y);
         float rScale = getMatrixScale(matrix);
         float rAngle = getMatrixAngle(matrix);
-        Log.d(TAG, logPrefix + ": matrix: { x: " + x + ", y: " + y + ", scale: " + rScale + ", angle: " + rAngle + " }");
+        // Log.d(TAG, logPrefix + ": matrix: { x: " + x + ", y: " + y + ", scale: " + rScale + ", angle: " + rAngle + " }");
     }
 
     /**

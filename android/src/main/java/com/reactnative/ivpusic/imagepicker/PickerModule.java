@@ -105,12 +105,15 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private int height = 0;
 
     private boolean ratioLock = false;
+    private boolean cropFrameLock = false;
     private double ratioWidth = 0;
     private double ratioHeight = 0;
     private String cropFrameColor = "#ffffff";
     private int cropFrameWidth = 0;
     private int cropCornerLength = 0;
     private int cropCornerWidth = 0;
+    private int cropExpandWidth = 0;
+    private int cropExtraPadding = 0;
     private boolean stillImageCropboxMove = false;
 
     private Uri mCameraCaptureURI;
@@ -162,12 +165,15 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         disableCropperColorSetters = options.hasKey("disableCropperColorSetters") && options.getBoolean("disableCropperColorSetters");
         useFrontCamera = options.hasKey("useFrontCamera") && options.getBoolean("useFrontCamera");
         ratioLock = options.hasKey("ratioLock") && options.getBoolean("ratioLock");
+        cropFrameLock = options.hasKey("cropFrameLock") && options.getBoolean("cropFrameLock");
         ratioWidth = options.hasKey("ratioWidth") ? options.getDouble("ratioWidth") : 0;
         ratioHeight = options.hasKey("ratioHeight") ? options.getDouble("ratioHeight") : 0;
         cropFrameColor = options.hasKey("cropFrameColor") ? options.getString("cropFrameColor") : null;
         cropFrameWidth = options.hasKey("cropFrameWidth") ? options.getInt("cropFrameWidth") : 0;
         cropCornerLength = options.hasKey("cropCornerLength") ? options.getInt("cropCornerLength") : 0;
         cropCornerWidth = options.hasKey("cropCornerWidth") ? options.getInt("cropCornerWidth") : 0;
+        cropExpandWidth = options.hasKey("cropExpandWidth") ? options.getInt("cropExpandWidth") : 0;
+        cropExtraPadding = options.hasKey("cropExtraPadding") ? options.getInt("cropExtraPadding") : 0;
         stillImageCropboxMove = options.hasKey("stillImageCropboxMove") ? options.getBoolean("stillImageCropboxMove") : false;
         this.options = options;
     }
@@ -656,7 +662,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         } catch (IOException e) {
             // Unable to create file, likely because external storage is
             // not currently mounted.
-            Log.w("image-crop-picker", "Error writing " + file, e);
+            // Log.w("image-crop-picker", "Error writing " + file, e);
         }
 
         return file;
@@ -773,11 +779,17 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         if (cropperCancelText != null) {
             options.setCropperCancelText(cropperCancelText);
         }
-        options.setCropFrameColor(Color.parseColor(cropFrameColor));
+        if (cropFrameColor != null) {
+            options.setCropFrameColor(Color.parseColor(cropFrameColor));
+            options.setCropGridCornerColor(Color.parseColor(cropFrameColor));
+        }
+        options.setRatioLock(ratioLock);
+        options.setCropFrameLock(cropFrameLock);
         options.setCropFrameStrokeWidth(cropFrameWidth);
-        options.setCropGridCornerColor(Color.parseColor(cropFrameColor));
         options.setCropCornerStrokeWidth(cropCornerWidth);
         options.setCropCornerStrokeLength(cropCornerLength);
+        options.setCropExpandWidth(cropExpandWidth);
+        options.setCropExtraPadding(cropExtraPadding);
         options.setStillImageCropboxMove(stillImageCropboxMove);
 
         if (enableRotationGesture) {
